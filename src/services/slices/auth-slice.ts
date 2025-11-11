@@ -1,0 +1,130 @@
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { TUser } from '@utils-types';
+import {
+  getUserApi,
+  loginUserApi,
+  logoutApi,
+  registerUserApi,
+  updateUserApi,
+  TLoginData,
+  TRegisterData
+} from '../../utils/burger-api';
+import { deleteCookie, setCookie } from '../../utils/cookie';
+
+interface TAuthState {
+  userInfo: TUser | null;
+  isAuthorized: boolean;
+  isLoading: boolean;
+  error: string | null;
+}
+
+const initialState: TAuthState = {
+  userInfo: null,
+  isAuthorized: false,
+  isLoading: false,
+  error: null
+};
+
+export const checkUserAuth = createAsyncThunk('auth/check', async () => {
+  const data = await getUserApi();
+  return data.user;
+});
+
+export const registerUser = createAsyncThunk(
+  'auth/register',
+  async ({ name, email, password }: TRegisterData) => {
+    const data = await registerUserApi({ email, password, name });
+    return data.user;
+  }
+);
+
+export const logIn = createAsyncThunk(
+  'auth/login',
+  async ({ email, password }: TLoginData) => {
+    const data = await loginUserApi({ email, password });
+    setCookie('accessToken', data.accessToken);
+    localStorage.setItem('refreshToken', data.refreshToken);
+    return data.user;
+  }
+);
+
+export const logOut = createAsyncThunk('auth/logout', async () => {
+  await logoutApi();
+  deleteCookie('accessToken');
+  localStorage.removeItem('refreshToken');
+});
+
+export const updateUser = createAsyncThunk(
+  'auth/update',
+  async ({ email, name, password }: TRegisterData) => {
+    const data = await updateUserApi({ email, name, password });
+    return data.user;
+  }
+);
+
+const authSlice = createSlice({
+  name: 'auth',
+  initialState,
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(checkUserAuth.fulfilled, (state, action) => {
+        state.userInfo = action.payload;
+        state.isAuthorized = true;
+      })
+      .addCase(checkUserAuth.rejected, (state) => {
+        state.userInfo = null;
+        state.isAuthorized = false;
+      })
+      .addCase(registerUser.fulfilled, (state, action) => {
+        state.userInfo = action.payload;
+        state.isAuthorized = true;
+      })
+      .addCase(logIn.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(logIn.fulfilled, (state, action) => {
+        state.userInfo = action.payload;
+        state.isAuthorized = true;
+        state.isLoading = false;
+      })
+      .addCase(logIn.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message || 'Login failed';
+      })
+      .addCase(logOut.fulfilled, (state) => {
+        state.userInfo = null;
+        state.isAuthorized = false;
+      })
+      .addCase(updateUser.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(updateUser.fulfilled, (state, action) => {
+        state.userInfo = action.payload;
+        state.isAuthorized = true;
+        state.isLoading = false;
+      })
+      .addCase(updateUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message || 'Login failed';
+      });
+  },
+  selectors: {
+    getUserInfo: (state): TUser | null => state.userInfo,
+    getUserAuthStatus: (state): boolean => state.isAuthorized,
+    getLoadingStatus: (state): boolean => state.isLoading,
+    getUserName: (state): string => state.userInfo?.name ?? '',
+    getErrorText: (state): string | null => state.error
+  }
+});
+
+export const {
+  getUserInfo,
+  getUserAuthStatus,
+  getLoadingStatus,
+  getUserName,
+  getErrorText
+} = authSlice.selectors;
+export default authSlice.reducer;
