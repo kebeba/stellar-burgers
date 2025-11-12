@@ -1,4 +1,5 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+
 import { TUser } from '@utils-types';
 import {
   getUserApi,
@@ -8,15 +9,15 @@ import {
   updateUserApi,
   TLoginData,
   TRegisterData
-} from '../../utils/burger-api';
+} from '@api';
 import { deleteCookie, setCookie } from '../../utils/cookie';
 
-interface TAuthState {
+type TAuthState = {
   userInfo: TUser | null;
   isAuthorized: boolean;
   isLoading: boolean;
   error: string | null;
-}
+};
 
 const initialState: TAuthState = {
   userInfo: null,
