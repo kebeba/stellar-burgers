@@ -51,4 +51,4 @@ export const { addIngredient, deleteIngredient, reorderIngredient } =
   constructorSlice.actions;
 export const { getState, check4Bun, getIngredients } =
   constructorSlice.selectors;
-export default constructorSlice.reducer;
+export const constructorReducer = constructorSlice.reducer;

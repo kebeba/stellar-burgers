@@ -25,7 +25,7 @@ export const requestIngredients = createAsyncThunk(
   async () => getIngredientsApi()
 );
 
-export const assortmentSlice = createSlice({
+const assortmentSlice = createSlice({
   name: 'assortment',
   initialState,
   reducers: {},
@@ -57,7 +57,7 @@ export const assortmentSlice = createSlice({
         state.errorText =
           action.error.message ?? 'Произошла непредвиденная ошибка';
       })
-      .addCase(requestIngredients.pending, (state, action) => {
+      .addCase(requestIngredients.pending, (state) => {
         state.isLoading = true;
         state.errorText = null;
       });
@@ -72,4 +72,4 @@ export const {
   getFillingStock,
   getSauceStock
 } = assortmentSlice.selectors;
-export default assortmentSlice.reducer;
+export const assortmentReducer = assortmentSlice.reducer;

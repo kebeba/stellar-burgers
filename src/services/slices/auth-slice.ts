@@ -128,4 +128,4 @@ export const {
   getUserName,
   getErrorText
 } = authSlice.selectors;
-export default authSlice.reducer;
+export const authReducer = authSlice.reducer;

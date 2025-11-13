@@ -35,7 +35,7 @@ function App() {
         <Route
           path='/login'
           element={
-            <RouteProtected>
+            <RouteProtected unAuthUserOnly>
               <Login />
             </RouteProtected>
           }
@@ -43,7 +43,7 @@ function App() {
         <Route
           path='/register'
           element={
-            <RouteProtected>
+            <RouteProtected unAuthUserOnly>
               <Register />
             </RouteProtected>
           }
@@ -51,7 +51,7 @@ function App() {
         <Route
           path='/forgot-password'
           element={
-            <RouteProtected>
+            <RouteProtected unAuthUserOnly>
               <ForgotPassword />
             </RouteProtected>
           }
@@ -59,7 +59,7 @@ function App() {
         <Route
           path='/reset-password'
           element={
-            <RouteProtected>
+            <RouteProtected unAuthUserOnly>
               <ResetPassword />
             </RouteProtected>
           }
