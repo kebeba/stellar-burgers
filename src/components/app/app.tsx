@@ -1,3 +1,6 @@
+import { useEffect } from 'react';
+import { Route, Routes, useNavigate } from 'react-router-dom';
+
 import {
   ConstructorPage,
   Feed,
@@ -11,8 +14,6 @@ import {
 } from '@pages';
 import '../../index.css';
 import styles from './app.module.css';
-import { Route, Routes } from 'react-router-dom';
-
 import {
   AppHeader,
   IngredientDetails,
@@ -21,7 +22,20 @@ import {
   RouteProtected
 } from '@components';
 
+import { useDispatch } from '../../services/store';
+import { requestIngredients } from '../../services/slices/assortment-slice';
+import { checkUserAuth } from '../../services/slices/auth-slice';
+
 function App() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(requestIngredients());
+  }, [dispatch]);
+  useEffect(() => {
+    dispatch(checkUserAuth());
+  }, [dispatch]);
+
   const modalClose = () => {
     console.log('modal_close');
   };

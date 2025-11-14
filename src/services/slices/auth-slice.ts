@@ -33,15 +33,17 @@ export const checkUserAuth = createAsyncThunk('auth/check', async () => {
 
 export const registerUser = createAsyncThunk(
   'auth/register',
-  async ({ name, email, password }: TRegisterData) => {
-    const data = await registerUserApi({ email, password, name });
-    return data.user;
+  async (userData: TRegisterData) => {
+    const rspData = await registerUserApi(userData);
+    localStorage.setItem('refreshToken', rspData.refreshToken);
+    setCookie('accessToken', rspData.accessToken);
+    return rspData.user;
   }
 );
 
 export const logIn = createAsyncThunk(
   'auth/login',
-  async ({ email, password }: TLoginData) => {
+  async ({ email, password }: { email: string; password: string }) => {
     const data = await loginUserApi({ email, password });
     setCookie('accessToken', data.accessToken);
     localStorage.setItem('refreshToken', data.refreshToken);
@@ -55,9 +57,17 @@ export const logOut = createAsyncThunk('auth/logout', async () => {
   localStorage.removeItem('refreshToken');
 });
 
-export const updateUser = createAsyncThunk(
+export const updateUserData = createAsyncThunk(
   'auth/update',
-  async ({ email, name, password }: TRegisterData) => {
+  async ({
+    email,
+    name,
+    password
+  }: {
+    email: string;
+    name: string;
+    password: string;
+  }) => {
     const data = await updateUserApi({ email, name, password });
     return data.user;
   }
@@ -77,10 +87,20 @@ const authSlice = createSlice({
         state.userInfo = null;
         state.isAuthorized = false;
       })
+
+      .addCase(registerUser.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.userInfo = action.payload;
         state.isAuthorized = true;
       })
+      .addCase(registerUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message || 'Ошибка регистрации пользователя';
+      })
+
       .addCase(logIn.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -92,24 +112,26 @@ const authSlice = createSlice({
       })
       .addCase(logIn.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.error.message || 'Login failed';
+        state.error = action.error.message || 'Ошибка входа';
       })
+
       .addCase(logOut.fulfilled, (state) => {
         state.userInfo = null;
         state.isAuthorized = false;
       })
-      .addCase(updateUser.pending, (state) => {
+
+      .addCase(updateUserData.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(updateUser.fulfilled, (state, action) => {
+      .addCase(updateUserData.fulfilled, (state, action) => {
         state.userInfo = action.payload;
         state.isAuthorized = true;
         state.isLoading = false;
       })
-      .addCase(updateUser.rejected, (state, action) => {
+      .addCase(updateUserData.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.error.message || 'Login failed';
+        state.error = action.error.message || 'Ошибка обновления профиля';
       });
   },
   selectors: {

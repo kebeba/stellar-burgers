@@ -1,9 +1,4 @@
-import {
-  createAsyncThunk,
-  createSlice,
-  createSelector,
-  PayloadAction
-} from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 import { getIngredientsApi } from '@api';
 import { TIngredient } from '@utils-types';
@@ -22,7 +17,10 @@ const initialState: TAssortmentState = {
 
 export const requestIngredients = createAsyncThunk(
   'assortment/fetch',
-  async () => getIngredientsApi()
+  async () => {
+    const data = await getIngredientsApi();
+    return data;
+  }
 );
 
 const assortmentSlice = createSlice({
@@ -32,19 +30,7 @@ const assortmentSlice = createSlice({
   selectors: {
     fetchIngredients: (state) => state.ingredients,
     getLoadingStatus: (state) => state.isLoading,
-    check4Error: (state) => state.errorText,
-    getBunStock: createSelector(
-      (state: TAssortmentState) => state.ingredients,
-      (ingredients) => ingredients.filter((i) => i.type == 'bun')
-    ),
-    getFillingStock: createSelector(
-      (state: TAssortmentState) => state.ingredients,
-      (ingredients) => ingredients.filter((i) => i.type == 'main')
-    ),
-    getSauceStock: createSelector(
-      (state: TAssortmentState) => state.ingredients,
-      (ingredients) => ingredients.filter((i) => i.type == 'sauce')
-    )
+    check4Error: (state) => state.errorText
   },
   extraReducers: (builder) => {
     builder
@@ -64,12 +50,6 @@ const assortmentSlice = createSlice({
   }
 });
 
-export const {
-  fetchIngredients,
-  getLoadingStatus,
-  check4Error,
-  getBunStock,
-  getFillingStock,
-  getSauceStock
-} = assortmentSlice.selectors;
+export const { fetchIngredients, getLoadingStatus, check4Error } =
+  assortmentSlice.selectors;
 export const assortmentReducer = assortmentSlice.reducer;
