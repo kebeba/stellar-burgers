@@ -52,6 +52,14 @@ function App() {
         <Route path='/feed/:number' element={<OrderInfo />} />
         <Route path='/ingredients/:id' element={<IngredientDetails />} />
         <Route
+          path='/profile/orders/:number'
+          element={
+            <RouteProtected>
+              <OrderInfo />
+            </RouteProtected>
+          }
+        />
+        <Route
           path='/login'
           element={
             <RouteProtected unAuthUserOnly>

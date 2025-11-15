@@ -16,7 +16,7 @@ import {
   getIngredients,
   clearIngredients
 } from '../../services/slices/constructor-slice';
-import { checkUserAuth } from '../../services/slices/auth-slice';
+import { getUserAuthStatus } from '../../services/slices/auth-slice';
 
 export const BurgerConstructor: FC = () => {
   /** TODO: взять переменные constructorItems, orderRequest и orderModalData из стора */
@@ -27,7 +27,7 @@ export const BurgerConstructor: FC = () => {
   const ingredients = useSelector(getIngredients);
   const orderModalData = useSelector(getCurrentOrderSelector);
   const orderRequest = useSelector(getOrderLoadingStatusSelector);
-  const isUserAuth = useSelector(checkUserAuth);
+  const isUserAuth = useSelector(getUserAuthStatus);
 
   const constructorItems = {
     bun,
@@ -35,10 +35,11 @@ export const BurgerConstructor: FC = () => {
   };
 
   const onOrderClick = () => {
-    if (!constructorItems.bun) {
-      return;
-    } else if (!isUserAuth) {
+    if (!isUserAuth) {
       navigate('/login');
+      return;
+    }
+    if (!constructorItems.bun) {
       return;
     }
     if (!bun || ingredients.length == 0 || orderRequest) {

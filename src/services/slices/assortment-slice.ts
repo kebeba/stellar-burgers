@@ -17,10 +17,7 @@ const initialState: TAssortmentState = {
 
 export const requestIngredients = createAsyncThunk(
   'assortment/fetch',
-  async () => {
-    const data = await getIngredientsApi();
-    return data;
-  }
+  getIngredientsApi
 );
 
 const assortmentSlice = createSlice({
