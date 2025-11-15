@@ -13,15 +13,15 @@ const initialState: TConstructorState = {
 };
 
 const constructorSlice = createSlice({
-  name: 'constructor',
+  name: 'burgerConstructor',
   initialState,
   reducers: {
     addIngredient: {
-      reducer: (state, { payload }: PayloadAction<TConstructorIngredient>) => {
-        if (payload.type == 'bun') {
-          state.bun = payload;
+      reducer: (state, action: PayloadAction<TConstructorIngredient>) => {
+        if (action.payload.type === 'bun') {
+          state.bun = action.payload;
         } else {
-          state.ingredients.push(payload);
+          state.ingredients.push(action.payload);
         }
       },
       prepare: (ingredient: TIngredient) => ({
@@ -36,19 +36,28 @@ const constructorSlice = createSlice({
       state,
       action: PayloadAction<{ fromIdx: number; toIdx: number }>
     ) => {
-      const ingredient = state.ingredients.splice(action.payload.fromIdx, 1)[0];
-      state.ingredients.splice(action.payload.toIdx, 0, ingredient);
+      const { fromIdx, toIdx } = action.payload;
+      const ingredient = state.ingredients.splice(fromIdx, 1)[0];
+      state.ingredients.splice(toIdx, 0, ingredient);
+    },
+    clearIngredients: (state) => {
+      state.bun = null;
+      state.ingredients = [];
     }
   },
   selectors: {
     getState: (state): TConstructorState => state,
     check4Bun: (state): TIngredient | null => state.bun,
-    getIngredients: (state): TConstructorIngredient[] => state.ingredients
+    getIngredients: (state): TConstructorIngredient[] => state.ingredients || []
   }
 });
 
-export const { addIngredient, deleteIngredient, reorderIngredient } =
-  constructorSlice.actions;
+export const {
+  addIngredient,
+  deleteIngredient,
+  reorderIngredient,
+  clearIngredients
+} = constructorSlice.actions;
 export const { getState, check4Bun, getIngredients } =
   constructorSlice.selectors;
 export const constructorReducer = constructorSlice.reducer;
