@@ -3,6 +3,19 @@ import { forwardRef } from 'react';
 import { TIngredientsCategoryUIProps } from './type';
 import { BurgerIngredient } from '@components';
 
+const processCypressData = (title: string) => {
+  switch (title) {
+    case 'Булки':
+      return 'assortment-buns';
+    case 'Начинки':
+      return 'assortment-fillings';
+    case 'Соусы':
+      return 'assortment-sauces';
+    default:
+      return '';
+  }
+};
+
 export const IngredientsCategoryUI = forwardRef<
   HTMLUListElement,
   TIngredientsCategoryUIProps
@@ -11,7 +24,7 @@ export const IngredientsCategoryUI = forwardRef<
     <h3 className='text text_type_main-medium mt-10 mb-6' ref={titleRef}>
       {title}
     </h3>
-    <ul className={styles.items} ref={ref}>
+    <ul className={styles.items} ref={ref} data-cy={processCypressData(title)}>
       {ingredients.map((ingredient) => (
         <BurgerIngredient
           ingredient={ingredient}
