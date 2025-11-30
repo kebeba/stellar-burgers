@@ -1,4 +1,11 @@
+import 'crypto';
 import '@testing-library/jest-dom';
+
+Object.defineProperty(globalThis, 'crypto', {
+  value: {
+    randomUUID: jest.fn(() => 'fake_ingredient_uuid')
+  }
+});
 
 jest.mock('@api', () => ({
   getIngredientsApi: jest.fn(),
